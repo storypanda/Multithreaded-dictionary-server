@@ -1,0 +1,1 @@
+{"meaning":"red fruit","word":"apple"}
