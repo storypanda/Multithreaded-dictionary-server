@@ -1,6 +1,7 @@
 package hhzhu;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -35,8 +36,8 @@ public class ClientConnection {
 			socket.connect( new InetSocketAddress(ip,port));
 			inputStream= socket.getInputStream();
 			outputStream = socket.getOutputStream();
-		}catch (Exception e) {
-			e.printStackTrace();
+		}catch (ConnectException e) {
+			System.out.println("Cannot Connect to Server");
 		}
 	}
 

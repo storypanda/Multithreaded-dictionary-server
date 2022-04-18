@@ -34,7 +34,7 @@ public class MultithreadedProcessing extends Thread {
         connection.close();
     }
 
-    private String handleRequest(ServerConnection conn) throws Exception {
+    private synchronized String handleRequest(ServerConnection conn) throws Exception {
         System.out.println("Receiving ...");
         ExchangeProtocol packet = conn.receiveString();
         short action = packet.getAction();
@@ -45,19 +45,27 @@ public class MultithreadedProcessing extends Thread {
         if(action==1){
             //Query
             String dictionaryContent = dictionaryIO.readLine(System.getProperty("path"));
+            if(dictionaryContent.equals("Dictionary file does not exist")){
+                System.out.println("Dictionary file does not exist");
+                return "Dictionary file does not exist";
+            }
             List<Dictionary> wordList = JSONArray.parseArray(dictionaryContent, Dictionary.class);
             for(Dictionary word:wordList){
                 if(word.getWord().equals(msg)){
                     return word.getMeaning();
                 }
             }
+            return "No such word, query fail";
         }else if(action==2){
             //Add
-            dictionaryIO.addJsonToTxt(msg);
-            return "Success";
+            return dictionaryIO.addJsonToTxt(msg);
         }else if(action==3){
             //Remove
             String dictionaryContent = dictionaryIO.readLine(System.getProperty("path"));
+            if(dictionaryContent.equals("Dictionary file does not exist")){
+                System.out.println("Dictionary file does not exist");
+                return "Dictionary file does not exist";
+            }
             List<Dictionary> wordList = JSONArray.parseArray(dictionaryContent, Dictionary.class);
             // Creating iterator object
             Iterator<Dictionary> itr = wordList.iterator();
@@ -66,12 +74,16 @@ public class MultithreadedProcessing extends Thread {
                 Dictionary word = itr.next();
                 if (word.getWord().equals(msg)){
                     itr.remove();
+                    String jsonArrStr = JSONArray.toJSONString(wordList);
+                    JSONArray jsonArray = JSONArray.parseArray(jsonArrStr);
+                    dictionaryIO.removeWordFromDictionary(jsonArray);
+                    return "Remove successful";
                 }
             }
-            String jsonArrStr = JSONArray.toJSONString(wordList);
-            JSONArray jsonArray = JSONArray.parseArray(jsonArrStr);
-            dictionaryIO.removeWordFromDictionary(jsonArray);
-            return "Success";
+            return "No such word, remove failed";
+        }else if(action==4){
+            //Update
+            return dictionaryIO.updateJsonToTxt(msg);
         }
         return "Fail";
     }

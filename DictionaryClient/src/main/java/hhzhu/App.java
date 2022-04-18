@@ -6,8 +6,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -25,10 +25,13 @@ import javafx.stage.Stage;
 public class App extends Application {
     HBox hBoxTop = new HBox();
     TextArea textAreaTop = new TextArea();
-    VBox vBoxTop = new VBox();
+    VBox vBoxButton = new VBox();
+    VBox vBoxTextArea = new VBox();
+    Label requiredFormat = new Label("Add and delete required format example: {\"word\":\"apple\",\"meaning\":\"red fruit\"}");
     Button query = new Button("Query");
     Button add = new Button("Add");
     Button remove = new Button("Remove");
+    Button update = new Button("Update");
 
     TextFlow textFlowCenter = new TextFlow();
     Text text = new Text();
@@ -74,19 +77,34 @@ public class App extends Application {
                     show();
                 }
             });
+            update.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent arg)
+                {
+                    String content = textAreaTop.getText();
+                    short action = 4;
+                    DictionaryClient dictionaryClient = new DictionaryClient();
+                    receivedContent = dictionaryClient.send(content,action);
+                    show();
+                }
+            });
             query.setPrefWidth(100);
             add.setPrefWidth(100);
             remove.setPrefWidth(100);
+            update.setPrefWidth(100);
             query.setId("lion");
             add.setId("lion");
             remove.setId("lion");
-            vBoxTop.setPadding(new Insets(0,5,0,5));
-            vBoxTop.setSpacing(8);
-            vBoxTop.getChildren().addAll(query,add,remove);
-            textAreaTop.setMaxHeight(105);
+            update.setId("lion");
+            vBoxButton.setPadding(new Insets(0,5,0,5));
+            vBoxButton.setSpacing(8);
+            vBoxButton.getChildren().addAll(query,add,remove,update);
+            textAreaTop.setMaxHeight(115);
             textAreaTop.setWrapText(true);
-            hBoxTop.getChildren().addAll(textAreaTop,vBoxTop);
-            HBox.setHgrow(textAreaTop, Priority.ALWAYS);
+            vBoxTextArea.setSpacing(5);
+            vBoxTextArea.getChildren().addAll(textAreaTop, requiredFormat);
+            hBoxTop.getChildren().addAll(vBoxTextArea, vBoxButton);
+            HBox.setHgrow(vBoxTextArea, Priority.ALWAYS);
             hBoxTop.setPadding(new Insets(5));
             root.setTop(hBoxTop);
 

@@ -21,9 +21,8 @@ public class DictionaryClient {
             conn.close();
             return reply;
         } catch (Exception e) {
-            e.printStackTrace();
+            return "Cannot Connect to Server, please check the command line parameters.";
         }
-        return "";
     }
 
 }
